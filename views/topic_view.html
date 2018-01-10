@@ -1,0 +1,47 @@
+{{template "header"}}
+	<title>{{.Topic.Title}}</title>
+</head>
+
+<body>
+  <div class="navbar navbar-default navbar-fixed-top">
+  	<div class="container">
+		{{template "navbar" .}}
+	</div>
+</div>
+
+<div class="container">
+	<div class="page-header">
+		<h1 >{{.Topic.Title}}<a href= "/topic/modify?tid={{.Tid}}" class="btn btn-default">修改文章</a></h1>		
+		{{.Topic.Content}}
+</div>
+</div>
+<div class="container">
+	{{$tid := .Tid}}
+	{{$IsLogin := .IsLogin}}
+	{{range .Replies}}
+		<h5> {{.Name}} <small>{{.Created}}</small> {{if $IsLogin}}<a href= "/reply/delete?tid={{$tid}}&rid={{.Id}}" class="btn btn-default">删除</a>{{end}}</h5>
+		
+		{{.Content}}
+	{{end}}
+	<h5>本文回复</h5>
+	<form method="post" action="/reply/add">
+		<input type="hidden" name="tid" value="{{.Topic.Id}}" >
+		<div class="form-group">
+			<lable>
+			显示昵称：
+			</lable >
+			<input type="text" name="nickname" class="form-control">			
+		</div>
+		<div class="form-group">
+			<lable>
+			评论内容：
+			</lable >
+			<textarea name="content" cols="30" rows="10" class="form-control"></textarea>			
+		</div>
+		<button class="btn btn-default" >submit</button>
+	</form>
+</div>
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"> </script>
+<script type="text/javascript" src="/static/js/bootstrap.min.js"> </script>
+</body>
+</html>
