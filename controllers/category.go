@@ -25,7 +25,6 @@ func (c *CategoryController) Get() {
 		}
 		err := models.AddCategory(name)
 		if err != nil {
-			//			没有查询到
 			fmt.Println("category 没有查到")
 			beego.Error(err)
 		}
