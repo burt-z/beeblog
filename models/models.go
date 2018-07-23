@@ -77,15 +77,11 @@ func AddCategory(name string) error {
 	//	Filter("title",name) 的意思是查询表里ititle字段与name 一致 ，One（）方法是因为只有一个而不是一个slice，所以用one
 	err := qs.Filter("title", name).One(cate)
 	if err == nil {
-		fmt.Println("没查到,")
 		return err //说明没有查询到
 	}
-	//	没有查询到执行插入的操作
-	fmt.Println("Category", cate.Title)
 	_, err = o.Insert(cate)
 	if err != nil {
 		//		执行插入报错
-		fmt.Println("插入报错")
 		return err
 	}
 	return nil
@@ -125,13 +121,17 @@ func AddTopic(title, category, content string) error {
 	if err != nil {
 		return err
 	}
-	//	更新分类
-	cate := new(Category)
-	qs := o.QueryTable("category")
-	fmt.Println("category", category)
-	err = qs.Filter("title", category).One(cate)
+	//	添加文章的时候添加了分类，更新分类的文章的数量
+	if len(category) > 0 {
+		cate := new(Category)
+		qs := o.QueryTable("category")
+		err = qs.Filter("title", category).One(cate)
+		if err == nil {
+			cate.TopicCount++
+			_, err = o.Update(cate)
+		}
 
-	fmt.Println("查询到重复的err", err)
+	}
 
 	return err
 
@@ -181,12 +181,40 @@ func ModifyTopic(tid, title, category, content string) error {
 	}
 	o := orm.NewOrm()
 	topic := &Topic{Id: tidNum}
+	var oldCate string
 	if o.Read(topic) == nil {
+		//从原来的数据库里面读取分类
+		oldCate = topic.Category
+		fmt.Println("老的分类", oldCate)
 		topic.Title = title
 		topic.Content = content
 		topic.Updated = time.Now()
 		topic.Category = category
 		o.Update(topic)
+	}
+	//更新老的分类
+	if len(oldCate) > 0 {
+
+		cate := new(Category)
+		qs := o.QueryTable("category")
+		err = qs.Filter("title", oldCate).One(cate)
+		if err == nil {
+			cate.TopicCount = cate.TopicCount - 1
+			fmt.Println("cate.TopicCount", cate.TopicCount)
+			_, err = o.Update(cate)
+		}
+	}
+	//更新新的分类
+	if len(category) > 0 {
+
+		cate := new(Category)
+		qs := o.QueryTable("category")
+		err = qs.Filter("title", category).One(cate)
+		if err == nil {
+			cate.TopicCount++
+			_, err = o.Update(cate)
+		}
+
 	}
 	return nil
 }
@@ -197,7 +225,24 @@ func DeleteTopic(tid string) error {
 	}
 	o := orm.NewOrm()
 	topic := &Topic{Id: tidNum}
-	_, err = o.Delete(topic)
+	var oldCate string
+	if o.Read(topic) == nil {
+		//获取原来的分类
+		oldCate = topic.Category
+		_, err = o.Delete(topic)
+		if err != nil {
+			return err
+		}
+	}
+	if len(oldCate) > 0 {
+		cate := new(Category)
+		qs := o.QueryTable("category")
+		err = qs.Filter("title", oldCate).One(cate)
+		if err == nil {
+			cate.TopicCount--
+			_, err = o.Update(cate)
+		}
+	}
 	return err
 }
 func AddReply(tid, nickname, content string) error {
