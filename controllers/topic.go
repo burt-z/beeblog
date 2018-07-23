@@ -38,7 +38,6 @@ func (c *TopicController) Post() {
 	content := c.Input().Get("content")
 	tid := c.Input().Get("tid")
 	category := c.Input().Get("category")
-
 	err = models.AddCategory(category)
 	if err != nil {
 		fmt.Println("添加文章插入分类报错")
