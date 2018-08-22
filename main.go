@@ -26,4 +26,6 @@ func main() {
 	beego.AutoRouter(&controllers.TopicController{}) //使用beego的只能路由，
 	beego.Run()
 	//提交测试1
+
+	//	鞥阿尕尔嘎哈的若干，第二次提交
 }
