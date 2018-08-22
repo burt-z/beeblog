@@ -52,4 +52,6 @@ func (c *CategoryController) Get() {
 		beego.Error(err)
 	}
 
+	//	第一次提交。
+
 }
