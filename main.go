@@ -25,5 +25,5 @@ func main() {
 	beego.Router("/reply/delete", &controllers.ReplyController{}, "get:Delete")
 	beego.AutoRouter(&controllers.TopicController{}) //使用beego的只能路由，
 	beego.Run()
-
+	//提交测试1
 }
