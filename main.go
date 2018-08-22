@@ -26,6 +26,4 @@ func main() {
 	beego.AutoRouter(&controllers.TopicController{}) //使用beego的只能路由，
 	beego.Run()
 	//提交测试1
-
-	//	阿哥两个神经病深V不打扰
 }
